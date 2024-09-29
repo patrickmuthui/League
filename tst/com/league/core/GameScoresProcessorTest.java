@@ -9,7 +9,6 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
 class GameScoresProcessorTest {
 
     private GameScoresProcessor genericProcessor;
@@ -106,6 +105,39 @@ class GameScoresProcessorTest {
 
         assertTrue(existingPointsTable.containsKey(teamName));
         assertEquals(priorTeamPoints + GameScoresProcessor.DRAW_POINTS, existingPointsTable.get(teamName));
+    }
+
+    @Test
+    void GivenNewTeamWins_WhenUpdatingScoreTable_ThenExpectedUpdateIsMade() {
+        final Map<String, Integer> existingPointsTable = new HashMap<>();
+        final String teamName = "FirstTeam";
+
+        genericProcessor.updateTeamPoints(existingPointsTable, teamName, GameScoresProcessor.WIN_POINTS);
+
+        assertTrue(existingPointsTable.containsKey(teamName));
+        assertEquals(GameScoresProcessor.WIN_POINTS, existingPointsTable.get(teamName));
+    }
+
+    @Test
+    void GivenNewTeamLoses_WhenUpdatingPointsTable_ThenExpectedUpdateIsMade() {
+        final Map<String, Integer> existingPointsTable = new HashMap<>();
+        final String teamName = "FirstTeam";
+
+        genericProcessor.updateTeamPoints(existingPointsTable, teamName, GameScoresProcessor.LOSS_POINTS);
+
+        assertTrue(existingPointsTable.containsKey(teamName));
+        assertEquals(GameScoresProcessor.LOSS_POINTS, existingPointsTable.get(teamName));
+    }
+
+    @Test
+    void GivenNewTeamDraws_WhenUpdatingPointsTable_ThenExpectedUpdateIsMade() {
+        final Map<String, Integer> existingPointsTable = new HashMap<>();
+        final String teamName = "FirstTeam";
+
+        genericProcessor.updateTeamPoints(existingPointsTable, teamName, GameScoresProcessor.DRAW_POINTS);
+
+        assertTrue(existingPointsTable.containsKey(teamName));
+        assertEquals(GameScoresProcessor.DRAW_POINTS, existingPointsTable.get(teamName));
     }
 
     private Map<String, Integer> getPointsTableWithSingleTeam() {
