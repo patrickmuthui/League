@@ -5,13 +5,9 @@ import com.league.util.TeamScore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 class GameScoresProcessorTest {
@@ -20,7 +16,7 @@ class GameScoresProcessorTest {
 
     private List<GameScore> genericGameScorelist;
 
-    private static final LinkedHashMap<String, Integer> genericExpectedLeagueTable = new LinkedHashMap<>();
+    private final LinkedHashMap<String, Integer> genericExpectedLeagueTable = new LinkedHashMap<>();
 
     @BeforeEach
     void setUp() {
@@ -41,11 +37,92 @@ class GameScoresProcessorTest {
     }
 
     @Test
-    void WhenGenericGameScorelistSupplied_ThenExpectedLeagueTableProduced() {
-        final Map<String, Integer> leagueTable = genericProcessor.generateLeagueTable(genericGameScorelist);
+    void GivenGenericGameScorelist_WhenGeneratingLeagueTable_ThenExpectedLeagueTableProduced() {
+        final Map<String, Integer> resultTable = genericProcessor.generateLeagueTable(genericGameScorelist);
 
-        assertEquals(genericExpectedLeagueTable.size(), leagueTable.size());
-        assertEquals(genericExpectedLeagueTable, leagueTable);
-        assertIterableEquals(Arrays.asList(genericExpectedLeagueTable.keySet().toArray()), Arrays.asList(leagueTable.keySet().toArray()));
+        assertLeagueTableEntries(genericExpectedLeagueTable, resultTable);
+    }
+
+    @Test
+    void GivenGenericGameScorelist_WhenCreatingScoreTable_ThenExpectedPointsTableProduced() {
+        final Map<String, Integer> resultTable = genericProcessor.createPointsTable(genericGameScorelist);
+
+        assertUnsortedScoreTableEntries(genericExpectedLeagueTable, resultTable);
+    }
+
+    @Test
+    void GivenWinLossScore_WhenCreatingScoreTable_ThenExpectedPointsTableProduced() {
+        final List<GameScore> winLossGameScoreList = List.of(
+                new GameScore(new TeamScore("FirstTeam", 2), new TeamScore("SecondTeam", 1)));
+        final Map<String, Integer> expectedScoreTable = Map.of("FirstTeam", 3, "SecondTeam", 0);
+
+        final Map<String, Integer> resultTable = genericProcessor.createPointsTable(winLossGameScoreList);
+
+        assertUnsortedScoreTableEntries(expectedScoreTable, resultTable);
+    }
+
+    @Test
+    void GivenDrawScore_WhenCreatingScoreTable_ThenExpectedPointsTableProduced() {
+        final List<GameScore> winLossGameScoreList = List.of(
+                new GameScore(new TeamScore("FirstTeam", 4), new TeamScore("SecondTeam", 4)));
+        final Map<String, Integer> expectedScoreTable = Map.of("FirstTeam", 1, "SecondTeam", 1);
+
+        final Map<String, Integer> resultTable = genericProcessor.createPointsTable(winLossGameScoreList);
+
+        assertUnsortedScoreTableEntries(expectedScoreTable, resultTable);
+    }
+
+    @Test
+    void GivenExistingTeamWins_WhenUpdatingScoreTable_ThenExpectedUpdateIsMade() {
+        final Map<String, Integer> existingPointsTable = getPointsTableWithSingleTeam();
+        final String teamName = (String) existingPointsTable.keySet().toArray()[0];
+        final Integer priorTeamPoints = existingPointsTable.get(teamName);
+
+        genericProcessor.updateTeamPoints(existingPointsTable, teamName, GameScoresProcessor.WIN_POINTS);
+
+        assertTrue(existingPointsTable.containsKey(teamName));
+        assertEquals(priorTeamPoints + GameScoresProcessor.WIN_POINTS, existingPointsTable.get(teamName));
+    }
+
+    @Test
+    void GivenExistingTeamLoses_WhenUpdatingPointsTable_ThenExpectedUpdateIsMade() {
+        final Map<String, Integer> existingPointsTable = getPointsTableWithSingleTeam();
+        final String teamName = (String) existingPointsTable.keySet().toArray()[0];
+        final Integer priorTeamPoints = existingPointsTable.get(teamName);
+
+        genericProcessor.updateTeamPoints(existingPointsTable, teamName, GameScoresProcessor.LOSS_POINTS);
+
+        assertTrue(existingPointsTable.containsKey(teamName));
+        assertEquals(priorTeamPoints + GameScoresProcessor.LOSS_POINTS, existingPointsTable.get(teamName));
+    }
+
+    @Test
+    void GivenExistingTeamDraws_WhenUpdatingPointsTable_ThenExpectedUpdateIsMade() {
+        final Map<String, Integer> existingPointsTable = getPointsTableWithSingleTeam();
+        final String teamName = (String) existingPointsTable.keySet().toArray()[0];
+        final Integer priorTeamPoints = existingPointsTable.get(teamName);
+
+        genericProcessor.updateTeamPoints(existingPointsTable, teamName, GameScoresProcessor.DRAW_POINTS);
+
+        assertTrue(existingPointsTable.containsKey(teamName));
+        assertEquals(priorTeamPoints + GameScoresProcessor.DRAW_POINTS, existingPointsTable.get(teamName));
+    }
+
+    private Map<String, Integer> getPointsTableWithSingleTeam() {
+        final Map<String, Integer> pointsTable = new HashMap<>();
+        pointsTable.put("FirstTeam", 3);
+        return pointsTable;
+    }
+
+    private void assertUnsortedScoreTableEntries(final Map<String, Integer> expectedTable, final Map<String, Integer> resultTable) {
+        assertEquals(expectedTable.size(), resultTable.size());
+        assertEquals(expectedTable, resultTable);
+    }
+
+    private void assertLeagueTableEntries(final Map<String, Integer> expectedTable, final Map<String, Integer> resultTable) {
+        assertEquals(expectedTable.size(), resultTable.size());
+        assertEquals(expectedTable, resultTable);
+        assertIterableEquals(Arrays.asList(expectedTable.keySet().toArray()), Arrays.asList(resultTable.keySet().toArray()));
+        assertIterableEquals(Arrays.asList(expectedTable.values().toArray()), Arrays.asList(resultTable.values().toArray()));
     }
 }
