@@ -3,12 +3,13 @@ package com.league.core;
 import com.league.util.FileReader;
 import com.league.util.GameScore;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Map;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
         // Validate input arguments
         if (args.length != 1){
             throw new RuntimeException("Usage: You must pass in one single argument");

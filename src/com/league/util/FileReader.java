@@ -1,66 +1,77 @@
 package com.league.util;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.Scanner;
-
 
 import static java.lang.String.format;
 
 public class FileReader {
 
-    private final String filePath;
+    private static final Logger log = Logger.getLogger(String.valueOf(FileReader.class));
+    private final File scoresFile;
+    private final Scanner fileScanner;
 
-    public FileReader(final String filePath) {
-        this.filePath = filePath;
+    public FileReader(final String filePath) throws FileNotFoundException {
+        try{
+            this.scoresFile = new File(filePath);
+            this.fileScanner = new Scanner(scoresFile);
+        }
+        catch (Exception e) {
+            log.severe(String.format("Error opening input file: %s", filePath));
+            throw e;
+        }
     }
 
     public List<GameScore> parseGameScores() {
         final List<GameScore> gameScores = new ArrayList<>();
 
         try {
-            // Create file object, open it and parse it
-            File scoresFile = new File(filePath);
-
-            Scanner scanner = new Scanner(scoresFile);
-
-            while (scanner.hasNextLine()){
-                String gameScoreLine = scanner.nextLine();
-                gameScores.add(parseGameScore(gameScoreLine));
+            while (fileScanner.hasNextLine()){
+                String gameScoreline = fileScanner.nextLine();
+                gameScores.add(parseGameScore(gameScoreline));
             }
-            scanner.close();
+            fileScanner.close();
 
             return gameScores;
         }
         catch (Exception e) {
-            throw new RuntimeException(String.format("Error opening and reading input file: %s", filePath), e);
+            log.severe(String.format("Error parsing input file: %s", scoresFile.getPath()));
+            throw e;
         }
     }
 
-    private GameScore parseGameScore(final String gameScoreLine) {
-        String[] gameScoreEntries = gameScoreLine.split(", ");
+    public GameScore parseGameScore(final String gameScoreline) {
+        String[] gameScoreEntries = gameScoreline.split(",");
         if (gameScoreEntries.length != 2){
-            throw new RuntimeException(format("Invalid game score line entry: %s", gameScoreLine));
+            throw new RuntimeException(format("Invalid game scoreline entry: %s", gameScoreline));
         }
 
         List<TeamScore> teamScores = new ArrayList<>();
-        Arrays.stream(gameScoreEntries).forEach(entry -> teamScores.add(parseTeamScore(entry)));
+        Arrays.stream(gameScoreEntries).forEach(entry -> teamScores.add(parseTeamScore(entry.trim())));
+
+        // A team cannot play itself. Throw if we detect this!
+        if (teamScores.getFirst().teamName().equals(teamScores.getLast().teamName())) {
+            throw new RuntimeException(format("Invalid game scoreline entry: %s", gameScoreline));
+        }
 
         return new GameScore(teamScores.getFirst(), teamScores.getLast());
     }
 
-    private TeamScore parseTeamScore(final String teamScoreLine) {
-        final String[] teamScoreEntries = teamScoreLine.split(" ", 0);
+    public TeamScore parseTeamScore(final String teamScoreline) {
+        final String[] teamScoreEntries = teamScoreline.split(" ", 0);
 
         // Validate that the last element is a number and concatenate other elements to a team name
         try {
             final String teamScore = Arrays.stream(teamScoreEntries).toList().getLast();
-            final String teamName = teamScoreLine.substring(0, teamScoreLine.lastIndexOf(" " + teamScore));
+            final String teamName = teamScoreline.substring(0, teamScoreline.lastIndexOf(" " + teamScore));
             return new TeamScore(teamName, Integer.parseInt(teamScore));
         } catch (Exception e) {
-            throw new RuntimeException(format("Invalid team score line: %s", teamScoreLine), e);
+            throw new RuntimeException(format("Invalid team scoreline: %s", teamScoreline), e);
         }
     }
 }
