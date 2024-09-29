@@ -1,7 +1,11 @@
 package com.league.util;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
+
 
 import static java.lang.String.format;
 
@@ -16,10 +20,10 @@ public class FileReader {
     public List<GameScore> parseGameScores() {
         final List<GameScore> gameScores = new ArrayList<>();
 
-        // Create file object, open it and parse it
-        File scoresFile = new File(filePath);
-
         try {
+            // Create file object, open it and parse it
+            File scoresFile = new File(filePath);
+
             Scanner scanner = new Scanner(scoresFile);
 
             while (scanner.hasNextLine()){
