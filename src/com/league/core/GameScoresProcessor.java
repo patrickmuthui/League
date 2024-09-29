@@ -8,11 +8,22 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Class that processes a list of validated game scores
+ * to produce a league table based on teams' performances
+ * in head-to-head matches.
+ */
 public class GameScoresProcessor {
     private static final Integer WIN_POINTS = 3;
     private static final Integer DRAW_POINTS = 1;
     private static final Integer LOSS_POINTS = 0;
 
+    /**
+     * This method creates and sorts in descending order, a league table from a list of game scores.
+     * If teams have the same number of points, they are ordered alphabetically in the table.
+     * @param gameScorelist List of game scores
+     * @return Sorted linked hash map representing the league table, complete with league points.
+     */
     public LinkedHashMap<String, Integer> generateLeagueTable(final List<GameScore> gameScorelist) {
         final Map<String, Integer> scoreTable = createScoreTable(gameScorelist);
 
@@ -24,6 +35,12 @@ public class GameScoresProcessor {
                 .collect(LinkedHashMap::new, (map, entry) -> map.put(entry.getKey(), entry.getValue()), Map::putAll);
     }
 
+    /**
+     * This method generates an unsorted score table by assigning points to teams based on performance.
+     * It assigns a team 3 points for a win, 1 point for a draw and 0 points for a loss.
+     * @param gameScoreList List of game scores
+     * @return Unsorted map representing the score table.
+     */
     private Map<String, Integer> createScoreTable(final List<GameScore> gameScoreList) {
         final Map<String, Integer> scoreTable = new HashMap<>();
 
@@ -43,6 +60,12 @@ public class GameScoresProcessor {
         return scoreTable;
     }
 
+    /**
+     * This method updates a team's points in a score table.
+     * @param scoreTable The score table to be modified.
+     * @param teamName The name of the team whose points are being added.
+     * @param addedPoints The number of points being added to the team's existing points.
+     */
     private void updateTeamPoints(final Map<String, Integer> scoreTable, final String teamName, final Integer addedPoints) {
         if (!scoreTable.containsKey(teamName)) {
             scoreTable.put(teamName, 0);

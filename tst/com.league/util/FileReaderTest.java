@@ -67,28 +67,28 @@ class FileReaderTest {
     @Test
     void GivenGenericFileReader_WhenParsingValidGameScorelines_ThenParsingSucceeds() throws Exception {
         validGameScorelineList.forEach(entry ->
-                assertDoesNotThrow(() -> genericFileReader.parseGameScore(entry)));
+                assertDoesNotThrow(() -> genericFileReader.validateGameScore(entry)));
     }
 
     @Test
     void GivenGenericFileReader_WhenParsingInValidGameScoreLine_ThenExpectedExceptionIsThrown() {
         invalidGameScorelineList.forEach(entry ->
                 assertThrows(RuntimeException.class,
-                        () -> genericFileReader.parseGameScore(entry),
+                        () -> genericFileReader.validateGameScore(entry),
                         String.format("Failed to throw for game scoreline: %s", entry)));
     }
 
     @Test
     void GivenGenericFileReader_WhenParsingValidTeamScorelines_ThenParsingSucceeds() {
         validTeamScorelineList.forEach(entry ->
-                assertDoesNotThrow(() -> genericFileReader.parseTeamScore(entry)));
+                assertDoesNotThrow(() -> genericFileReader.validateTeamScore(entry)));
     }
 
     @Test
     void GivenGenericFileReader_WhenParsingInValidTeamScoreLine_ThenExpectedExceptionIsThrown() {
         invalidTeamScorelineList.forEach(entry ->
                 assertThrows(RuntimeException.class,
-                        () -> genericFileReader.parseTeamScore(entry),
+                        () -> genericFileReader.validateTeamScore(entry),
                         String.format("Failed to throw for game scoreline: %s", entry)));
     }
 }
