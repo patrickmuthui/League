@@ -4,6 +4,7 @@ import com.league.util.FileReader;
 import com.league.util.GameScore;
 
 import java.io.FileNotFoundException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,10 +17,10 @@ public class Main {
         }
 
         final FileReader fileReader = new FileReader(args[0]);
-        final List<GameScore> gameScoreList = fileReader.parseGameScores();
+        final List<GameScore> gameScorelist = fileReader.parseGameScores();
 
         final GameScoresProcessor processor = new GameScoresProcessor();
-        final Map<String, Integer> leagueTable = processor.generateLeagueTable(gameScoreList);
+        final LinkedHashMap<String, Integer> leagueTable = processor.generateLeagueTable(gameScorelist);
 
         Integer position = 1;
         for (Map.Entry<String, Integer> entry : leagueTable.entrySet()) {

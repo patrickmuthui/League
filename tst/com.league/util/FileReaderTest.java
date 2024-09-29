@@ -13,8 +13,10 @@ class FileReaderTest {
     private final String validFilePath = "/Users/diananyabongo/IdeaProjects/League/tst/testresources/InputScores.txt";
     private final String invalidFilePath = "Fake/Path";
 
+    private FileReader genericFileReader;
+
     private final String genericTeamScoreline = "MyTeam 10";
-    private String genericGameScoreline = "FirstTeam 3, SecondTeam 5";
+    private final String genericGameScoreline = "FirstTeam 3, SecondTeam 5";
 
     private final List<String> validTeamScorelineList = List.of(
             genericTeamScoreline,
@@ -25,7 +27,8 @@ class FileReaderTest {
     private final List<String> invalidTeamScorelineList = List.of(
             "FirstTeam One", // Test score
             "FirstTeam 10.7", // Decimal score
-            "FirstTeam" // No score
+            "FirstTeam", // No score
+            "1 FirstTeam" // Flipped score and name
     );
 
     private final List<String> validGameScorelineList = List.of(
@@ -40,8 +43,6 @@ class FileReaderTest {
             "SecondTeam 6" // Less than 2 teams in a game scoreline
     );
 
-
-    private FileReader genericFileReader;
 
     @BeforeEach
     void setUp() throws FileNotFoundException {
@@ -74,6 +75,20 @@ class FileReaderTest {
         invalidGameScorelineList.forEach(entry ->
                 assertThrows(RuntimeException.class,
                         () -> genericFileReader.parseGameScore(entry),
+                        String.format("Failed to throw for game scoreline: %s", entry)));
+    }
+
+    @Test
+    void GivenGenericFileReader_WhenParsingValidTeamScorelines_ThenParsingSucceeds() {
+        validTeamScorelineList.forEach(entry ->
+                assertDoesNotThrow(() -> genericFileReader.parseTeamScore(entry)));
+    }
+
+    @Test
+    void GivenGenericFileReader_WhenParsingInValidTeamScoreLine_ThenExpectedExceptionIsThrown() {
+        invalidTeamScorelineList.forEach(entry ->
+                assertThrows(RuntimeException.class,
+                        () -> genericFileReader.parseTeamScore(entry),
                         String.format("Failed to throw for game scoreline: %s", entry)));
     }
 }
