@@ -1,0 +1,20 @@
+Welcome to the LeagueApp!
+
+Development:
+- IDE: IntelliJ Community Edition.
+
+Added modules:
+- JUnit5 for unit tests
+- Mockito for mocking in unit tests
+
+Distribution:
+- Used jpackage to build .dmg files, to enable easy installation of the built artefacts on Mac OS.
+
+Installation instructions:
+- Either build the jar or retrieve it via the .dmg installer (for Mac OS only) on email (because being executables they have not been committed to git)
+- (Mac OS) If you have the .dmg, simply double-click the .dmg to run, and drag the app to the Applications folder.
+
+Running instructions:
+- <Path to application> <absolute path to the sample input file>. For example:
+/Applications/LeagueApp.app/Contents/MacOS/LeagueApp /Users/diananyabongo/IdeaProjects/League/tst/testresources/InputScores.txt
+- the example above uses the InputScores.txt file committed to git.
